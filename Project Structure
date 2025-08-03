@@ -1,0 +1,18 @@
+lib/
+├── main.dart                # Main application entry point
+├── screens/
+│   ├── welcome_screen.dart  # Welcome screen with get started button
+│   ├── login_screen.dart    # Login and OTP verification
+│   ├── home_screen.dart     # Main dashboard with quick actions
+│   ├── doctor_list.dart     # Browse available doctors
+│   ├── booking_screen.dart  # Appointment scheduling
+│   └── appointments.dart    # Manage appointments
+├── models/
+│   ├── doctor.dart          # Doctor data model
+│   └── appointment.dart     # Appointment data model
+├── widgets/
+│   ├── action_card.dart     # Reusable action card component
+│   └── appointment_card.dart# Appointment card component
+└── constants/
+    ├── colors.dart          # App color palette
+    └── doctors.dart         # Sample doctor data
