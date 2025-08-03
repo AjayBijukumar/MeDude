@@ -1,8 +1,8 @@
-# MediCare - Doctor Appointment App
+# MeDude - Doctor Appointment App
 
-![MediCare App Screenshot](screenshots/app-screenshot.png) <!-- Add your screenshot later -->
 
-MediCare is a modern, user-friendly doctor appointment booking application designed to help users easily schedule medical consultations. The app features a beautiful UI with smooth animations and intuitive navigation.
+
+MeDude is a modern, user-friendly doctor appointment booking application designed to help users easily schedule medical consultations. The app features a beautiful UI with smooth animations and intuitive navigation.
 
 ## Features
 
