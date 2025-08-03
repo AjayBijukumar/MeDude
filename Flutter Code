@@ -1,0 +1,1232 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+void main() {
+  runApp(const MediCareApp());
+}
+
+class MediCareApp extends StatelessWidget {
+  const MediCareApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
+
+    return MaterialApp(
+      title: 'MediCare',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        fontFamily: 'Poppins',
+      ),
+      home: const WelcomeScreen(),
+    );
+  }
+}
+
+// ===== Color Palette =====
+class AppColors {
+  static const primary = Color(0xFF6C63FF);
+  static const secondary = Color(0xFFFF6584);
+  static const accent = Color(0xFF42C2FF);
+  static const success = Color(0xFF4CAF50);
+  static const warning = Color(0xFFFF9800);
+  static const danger = Color(0xFFF44336);
+  static const light = Color(0xFFF8F9FA);
+  static const dark = Color(0xFF212529);
+
+  static const gradientBg = LinearGradient(
+    colors: [Color(0xFF6C63FF), Color(0xFFFF6584)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const gradientCard = LinearGradient(
+    colors: [Color(0xFF42C2FF), Color(0xFF6C63FF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
+// ===== Welcome Screen =====
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppColors.gradientBg,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.favorite,
+                color: Colors.white,
+                size: 60,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Welcome to MediCare',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 15),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  'Book doctor appointments with ease and take control of your health journey',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  elevation: 5,
+                ),
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== Login Screen =====
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool showOtpField = false;
+  final emailController = TextEditingController();
+  final otpController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Welcome Back!',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Sign in to book your appointments',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email Address',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!showOtpField)
+                  ElevatedButton(
+                    onPressed: () {
+                      if (emailController.text.isEmpty ||
+                          !emailController.text.contains('@')) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please enter a valid email address'),
+                            backgroundColor: AppColors.warning,
+                          ),
+                        );
+                        return;
+                      }
+                      setState(() {
+                        showOtpField = true;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('OTP sent to ${emailController.text}'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text('Send OTP'),
+                  ),
+                if (showOtpField) ...[
+                  TextField(
+                    controller: otpController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter OTP',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (otpController.text.length != 6) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please enter a valid 6-digit OTP'),
+                            backgroundColor: AppColors.warning,
+                          ),
+                        );
+                        return;
+                      }
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(
+                            username: 'User',
+                          ),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Login successful!'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text('Verify & Login'),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== Home Screen =====
+class HomeScreen extends StatefulWidget {
+  final String username;
+
+  const HomeScreen({super.key, required this.username});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Hi, ${widget.username}'),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.gradientBg,
+          ),
+        ),
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          // Home Tab
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                    'What do you want to do today?',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        padding: const EdgeInsets.all(20),
+                        childAspectRatio: 1.2,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        children: [
+                          _buildActionCard(
+                            icon: Icons.calendar_today,
+                            label: 'Book Appointment',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DoctorListScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          _buildActionCard(
+                            icon: Icons.video_call,
+                            label: 'Video Consult',
+                          ),
+                          _buildActionCard(
+                            icon: Icons.local_pharmacy,
+                            label: 'Find Pharmacy',
+                          ),
+                          _buildActionCard(
+                            icon: Icons.medical_services,
+                            label: 'Emergency',
+                          ),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Upcoming Consultation',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _buildAppointmentCard(),
+                      ),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Search Tab
+          const Center(child: Text('Search')),
+          // Appointments Tab
+          const AppointmentsScreen(),
+          // Chat Tab
+          const Center(child: Text('Chat')),
+          // Profile Tab
+          const Center(child: Text('Profile')),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Appointments',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionCard({
+    required IconData icon,
+    required String label,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 40,
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppointmentCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Dr. Theressa Wahler',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'Today, 2:30 PM (30 mins)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              const Icon(
+                Icons.video_call,
+                color: AppColors.primary,
+                size: 30,
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'Video Consultation',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ===== Doctor List Screen =====
+class DoctorListScreen extends StatelessWidget {
+  const DoctorListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Available Doctors'),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.gradientBg,
+          ),
+        ),
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(15),
+        itemCount: doctors.length,
+        itemBuilder: (context, index) {
+          final doctor = doctors[index];
+          return _buildDoctorCard(doctor, context);
+        },
+      ),
+    );
+  }
+
+  Widget _buildDoctorCard(Doctor doctor, BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 15),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BookingScreen(doctor: doctor),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(15),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                doctor.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                '${doctor.specialty} • ${doctor.experience}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                doctor.clinic,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'Schedule',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'Details',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== Booking Screen =====
+class BookingScreen extends StatefulWidget {
+  final Doctor doctor;
+
+  const BookingScreen({super.key, required this.doctor});
+
+  @override
+  State<BookingScreen> createState() => _BookingScreenState();
+}
+
+class _BookingScreenState extends State<BookingScreen> {
+  String? selectedDate;
+  String? selectedTime;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.doctor.name,
+              style: const TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              '${widget.doctor.specialty} • ${widget.doctor.experience}',
+              style: const TextStyle(
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.gradientBg,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildCalendar(),
+            _buildTimeSlots(),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (selectedDate == null || selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please select a date and time slot'),
+                        backgroundColor: AppColors.warning,
+                      ),
+                    );
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Appointment booked with ${widget.doctor.name} at $selectedTime',
+                      ),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  elevation: 5,
+                ),
+                child: const Text('Book Appointment'),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendar() {
+    return Card(
+      margin: const EdgeInsets.all(20),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Mon'),
+                Text('Tue'),
+                Text('Wed'),
+                Text('Thu'),
+                Text('Fri'),
+                Text('Sat'),
+                Text('Sun'),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildDate('11'),
+                _buildDate('12'),
+                _buildDate('13'),
+                _buildDate('14'),
+                _buildDate('15'),
+                _buildDate('16'),
+                _buildDate('17'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDate(String date) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedDate = date;
+        });
+      },
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: selectedDate == date ? AppColors.primary : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            date,
+            style: TextStyle(
+              color: selectedDate == date ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeSlots() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Choose schedule time',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 15),
+            _buildTimeGroup('Morning', ['08:30', '09:00', '09:30', '10:00']),
+            const SizedBox(height: 15),
+            _buildTimeGroup('Noon', ['10:30', '11:00']),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeGroup(String title, List<String> times) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: times.map((time) {
+            return _buildTimeSlot(time);
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimeSlot(String time) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedTime = time;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        decoration: BoxDecoration(
+          color: selectedTime == time ? AppColors.primary : Colors.white,
+          border: Border.all(
+            color: selectedTime == time
+                ? AppColors.primary
+                : Colors.grey.withOpacity(0.3),
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          time,
+          style: TextStyle(
+            color: selectedTime == time ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== Appointments Screen =====
+class AppointmentsScreen extends StatefulWidget {
+  const AppointmentsScreen({super.key});
+
+  @override
+  State<AppointmentsScreen> createState() => _AppointmentsScreenState();
+}
+
+class _AppointmentsScreenState extends State<AppointmentsScreen> {
+  List<Appointment> appointments = [
+    Appointment(
+      id: 1,
+      doctorName: 'Dr. Asha Mehta',
+      specialty: 'Cardiologist',
+      clinic: 'Apollo Hospital, Delhi',
+      date: '15 May 2023',
+      time: '10:30 AM',
+      type: 'In-person',
+    ),
+    Appointment(
+      id: 2,
+      doctorName: 'Dr. Vikram Rao',
+      specialty: 'Dermatologist',
+      clinic: 'Fortis, Mumbai',
+      date: '20 May 2023',
+      time: '2:00 PM',
+      type: 'Video Consultation',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Appointments'),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.gradientBg,
+          ),
+        ),
+      ),
+      body: appointments.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'No appointments booked yet',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(15),
+              itemCount: appointments.length,
+              itemBuilder: (context, index) {
+                final appointment = appointments[index];
+                return _buildAppointmentCard(appointment);
+              },
+            ),
+    );
+  }
+
+  Widget _buildAppointmentCard(Appointment appointment) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 15),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  appointment.doctorName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    _showCancelDialog(appointment.id);
+                  },
+                  color: AppColors.danger,
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              appointment.specialty,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${appointment.date}, ${appointment.time}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.success.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                appointment.type,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.success,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              appointment.clinic,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showCancelDialog(int appointmentId) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Appointment'),
+          content: const Text(
+              'Are you sure you want to cancel this appointment? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No, Keep It'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  appointments.removeWhere(
+                      (appointment) => appointment.id == appointmentId);
+                });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Appointment cancelled successfully!'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              },
+              child: const Text(
+                'Yes, Cancel',
+                style: TextStyle(
+                  color: AppColors.danger,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ===== Data Models =====
+class Doctor {
+  final String name;
+  final String specialty;
+  final String experience;
+  final String clinic;
+
+  const Doctor({
+    required this.name,
+    required this.specialty,
+    required this.experience,
+    required this.clinic,
+  });
+}
+
+class Appointment {
+  final int id;
+  final String doctorName;
+  final String specialty;
+  final String clinic;
+  final String date;
+  final String time;
+  final String type;
+
+  const Appointment({
+    required this.id,
+    required this.doctorName,
+    required this.specialty,
+    required this.clinic,
+    required this.date,
+    required this.time,
+    required this.type,
+  });
+}
+
+// ===== Sample Data =====
+const List<Doctor> doctors = [
+  Doctor(
+    name: "Dr. Asha Mehta",
+    specialty: "Cardiologist",
+    experience: "10 yrs",
+    clinic: "Apollo Hospital, Delhi",
+  ),
+  Doctor(
+    name: "Dr. Vikram Rao",
+    specialty: "Dermatologist",
+    experience: "8 yrs",
+    clinic: "Fortis, Mumbai",
+  ),
+  Doctor(
+    name: "Dr. Neha Iyer",
+    specialty: "Pediatrician",
+    experience: "12 yrs",
+    clinic: "Rainbow Clinic, Chennai",
+  ),
+  Doctor(
+    name: "Dr. Rajeev Singh",
+    specialty: "ENT Specialist",
+    experience: "15 yrs",
+    clinic: "Max Health, Jaipur",
+  ),
+  Doctor(
+    name: "Dr. Priya Sharma",
+    specialty: "Gynecologist",
+    experience: "11 yrs",
+    clinic: "Cloudnine, Bengaluru",
+  ),
+  Doctor(
+    name: "Dr. Arjun Nair",
+    specialty: "Neurologist",
+    experience: "9 yrs",
+    clinic: "Aster Hospital, Kochi",
+  ),
+  Doctor(
+    name: "Dr. Kavitha Joshi",
+    specialty: "Dentist",
+    experience: "6 yrs",
+    clinic: "Tooth & Care, Pune",
+  ),
+  Doctor(
+    name: "Dr. Manoj Das",
+    specialty: "General Physician",
+    experience: "18 yrs",
+    clinic: "City Clinic, Kolkata",
+  ),
+  Doctor(
+    name: "Dr. Renu Patil",
+    specialty: "Psychiatrist",
+    experience: "13 yrs",
+    clinic: "MindCare, Nagpur",
+  ),
+  Doctor(
+    name: "Dr. Karan Sinha",
+    specialty: "Oncologist",
+    experience: "14 yrs",
+    clinic: "Tata Memorial, Mumbai",
+  ),
+];
